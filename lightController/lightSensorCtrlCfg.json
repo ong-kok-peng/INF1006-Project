@@ -1,0 +1,18 @@
+{
+    "constants": {
+        "push_switch_gpio": 17,
+        "pir_gpio": 27,
+        "light_relay_gpio": 22,
+        "ldr_voltdivider_r1": 6920,
+        "ads1115_gain": 1,
+        "ina199_gain": 50,
+        "ina199_shunt": 0.04,
+        "log_server_ip": "http://192.168.10.113/logPiSensor.php"
+    },
+    "settings": {
+        "light_voltage": 5.05,
+        "lux_darkness": 47,
+        "sensor_interval_sec": 1,
+        "log_interval_min": 7
+    }
+}
