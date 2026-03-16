@@ -62,7 +62,7 @@ def log_lightState(lightState):
     else: lightStatus = "Light off!"
 
     try:
-        response = requests.post(configConstants["log_server_ip"], json=jsonData)
+        response = requests.post(configConstants["log_server_ip"], json=jsonData, timeout=3)
         response.raise_for_status() 
         result = response.json()
         
@@ -71,8 +71,10 @@ def log_lightState(lightState):
         elif response.status_code == 200 and result["status"] == "error":
             print(f"{lightStatus} {result['errormessage']}")
         
+    except requests.exceptions.Timeout:
+        print(f"{lightStatus} Log server cannot be reached.")
     except requests.exceptions.HTTPError as http_err:
-        print(f"HTTP error occurred: {http_err}")
+        print(f"{lightStatus} HTTP error occurred: {http_err}")
 
 def log_lightPower():
     light_amp = light_adcIna199.voltage / configConstants["ina199_gain"] / configConstants["ina199_shunt"]
@@ -83,7 +85,7 @@ def log_lightPower():
     
     #"""
     try:
-        response = requests.post(configConstants["log_server_ip"], json=jsonData)
+        response = requests.post(configConstants["log_server_ip"], json=jsonData, timeout=3)
         response.raise_for_status() 
         result = response.json()
         
@@ -92,8 +94,10 @@ def log_lightPower():
         elif response.status_code == 200 and result["status"] == "error":
             print(f"Light power: {light_watt:.3f} W. {result['errormessage']}")
         
+    except requests.exceptions.Timeout:
+        print(f"Light power: {light_watt:.3f} W. Log server cannot be reached.")
     except requests.exceptions.HTTPError as http_err:
-        print(f"HTTP error occurred: {http_err}")
+        print(f"Light power: {light_watt:.3f} W. HTTP error occurred: {http_err}")
     #"""
     
 

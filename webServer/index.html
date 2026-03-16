@@ -1,0 +1,33 @@
+<html>
+    <title>Home Automation Lights Control</title>
+    <head>
+        <script src="index.js"></script>
+        <style>
+            /* put the css here */
+        </style>
+    </head>
+    <body>
+        <div class="mainContainer">
+            <div class="subContainer" id="lightCtrlSwitches">
+                <p>Lights remote control</p>
+                <p>
+                    <label>Room 1</label><button>Turn On</button>
+                </p>
+                <p>
+                    <label>Room 2</label><button>Turn On</button>
+                </p>
+            </div>
+            <div class="subContainer" id="lightCtrlSettings">
+                <p>Lights control settings</p>
+                <div id="lightCtrlSettingsForm">
+                    <p>
+                        <label>Select room: </label>
+                        <select id="roomsAvailable" onchange="selectRoom">
+                            <option value="">No selection</option>
+                        </select>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

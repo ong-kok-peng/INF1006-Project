@@ -7,11 +7,12 @@
         "ads1115_gain": 1,
         "ina199_gain": 50,
         "ina199_shunt": 0.04,
-        "log_server_ip": "http://192.168.10.113/logPiSensor.php"
+        "log_server_ip_old": "http://192.168.10.113/logPiSensor.php",
+        "log_server_ip": "http://10.150.189.1/logPiSensor.php"
     },
     "settings": {
         "light_voltage": 5.05,
-        "lux_darkness": 47,
+        "lux_darkness": 100,
         "sensor_interval_sec": 1,
         "log_interval_min": 7
     }
