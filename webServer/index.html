@@ -1,33 +1,37 @@
 <html>
     <title>Home Automation Lights Control</title>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="jquery371.min.js"></script>
         <script src="index.js"></script>
         <style>
-            /* put the css here */
+            .mainContainer {width: 90%; margin:auto; font-family: Arial, Helvetica, sans-serif; font-size: 15pt;}
+            .subContainer {border:2px black solid; border-radius:15px; padding:15px; margin:20px 0;}
+            .subContainerRow {width:60%; margin:10px auto;}
+            .userInput {height:35px; margin-left:10px; font-size:12pt;}
+            #lightCtrlSettingsForm .formField {display:block; margin:10px auto; }
         </style>
     </head>
     <body>
         <div class="mainContainer">
             <div class="subContainer" id="lightCtrlSwitches">
-                <p>Lights remote control</p>
-                <p>
-                    <label>Room 1</label><button>Turn On</button>
-                </p>
-                <p>
-                    <label>Room 2</label><button>Turn On</button>
-                </p>
+                <p class="subContainerRow" style="font-weight: bold;">Lights remote control</p>
+                <!-- Each room switch button row populates here-->
             </div>
             <div class="subContainer" id="lightCtrlSettings">
-                <p>Lights control settings</p>
-                <div id="lightCtrlSettingsForm">
-                    <p>
-                        <label>Select room: </label>
-                        <select id="roomsAvailable" onchange="selectRoom">
-                            <option value="">No selection</option>
-                        </select>
-                    </p>
+                <p class="subContainerRow" style="font-weight: bold;">Lights control settings</p>
+                <p class="subContainerRow">
+                    <label>Select room: </label>
+                    <select id="selRoomDrpDwn" class="userInput">
+                        <option value="">No selection</option>
+                        <!-- Each room selection option populates here-->
+                    </select>
+                </p>
+                <div id="lightCtrlSettingsForm" class="subContainerRow">
+                    <!-- Each settings field populates here-->
                 </div>
             </div>
         </div>
     </body>
 </html>
+

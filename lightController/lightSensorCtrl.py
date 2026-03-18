@@ -1,7 +1,8 @@
 import math, json, sys, time, threading, requests
 from datetime import datetime
 from flask import Flask, render_template, request
-from gpiozero import LED, Button, GPIOZeroError
+from flask_cors import CORS
+from gpiozero import LED, Button, MotionSensor, GPIOZeroError
 import board
 from adafruit_ads1x15 import ADS1115, AnalogIn, ads1x15
 
@@ -15,14 +16,24 @@ maxRetries = 5
 light_adcIna199 = None
 ldr_adc = None
 light_relay = None
+
 light_pushswitch = None
 light_pushswitch_state = 0 # 0 is not pressed, 1 is pressed
 
+#light_touchswitch = None
+#light_touchswitch_state = 0 # 0 when not pressed, 1 is pressed
+
+light_pirSensor = None
+light_pirSensor_state = 0 # 0 when no motion, 1 is motion detected
+
 app = Flask(__name__)
+# define the HTTP server frontend page IP here to prevent browser CORS error
+CORS(app, origins=["http://10.150.189.1"])
+#CORS(app, origins=["http://192.168.1.10"])
 
 def initSensors():
     try:
-        global light_adcIna199, ldr_adc, light_relay, light_pushswitch
+        global light_adcIna199, ldr_adc, light_relay, light_pushswitch, light_pirSensor
         i2c = board.I2C()
         adc = ADS1115(i2c)
         adc.gain = configConstants["ads1115_gain"]
@@ -30,10 +41,19 @@ def initSensors():
 
         ldr_adc = AnalogIn(adc, ads1x15.Pin.A0)
         light_adcIna199 = AnalogIn(adc, ads1x15.Pin.A2)
+
         light_relay = LED(configConstants["light_relay_gpio"])
         light_relay.off()
+
         light_pushswitch = Button(configConstants["push_switch_gpio"], bounce_time=0.05)
         light_pushswitch.when_pressed = light_pushswitch_pressed
+
+        #light_touchswitch = Button(configConstants["push_switch_gpio"], pull_up=None, active_state=True)
+        #light_touchswitch.when_pressed = light_touchswitch_pressed
+
+        light_pirSensor = MotionSensor(configConstants["pir_gpio"])
+        light_pirSensor.when_motion = light_pirSensor_hasmotion
+
         print("GPIOs init OK!")
         return True
         
@@ -44,11 +64,27 @@ def initSensors():
     except GPIOZeroError as e:
         print(f"GPIO init error: {e}"); return False
 
+
 def light_pushswitch_pressed():
     global light_pushswitch_state
     light_pushswitch_state = 1
     time.sleep(1)
     light_pushswitch_state = 0
+
+"""
+def light_touchswitch_pressed():
+    global light_touchswitch_state
+    light_touchswitch_state = 1
+    time.sleep(1)
+    light_touchswitch_state = 0
+"""
+
+def light_pirSensor_hasmotion():
+    global light_pirSensor_state
+    print("Motion!")
+    light_pirSensor_state = 1
+    time.sleep(1)
+    light_pirSensor_state = 0
 
 def ldrResistanceToLux(ldrResistance):
     resistance10Lux = 25000
@@ -83,7 +119,6 @@ def log_lightPower():
 
     #print(f"{light_amp:.3f} A, {light_watt:.3f} W")
     
-    #"""
     try:
         response = requests.post(configConstants["log_server_ip"], json=jsonData, timeout=3)
         response.raise_for_status() 
@@ -98,8 +133,6 @@ def log_lightPower():
         print(f"Light power: {light_watt:.3f} W. Log server cannot be reached.")
     except requests.exceptions.HTTPError as http_err:
         print(f"Light power: {light_watt:.3f} W. HTTP error occurred: {http_err}")
-    #"""
-    
 
 def pollSensors():
     while True:
@@ -108,7 +141,6 @@ def pollSensors():
             timeNow = datetime.now().strftime("%H:%M:%S"); timeMinute = int(timeNow.split(':')[1]); timeSecond = int(timeNow.split(':')[2])
             if timeMinute % configSettings["log_interval_min"] == 0 and timeSecond == 0:
                 log_lightPower()
-            #log_lightPower()
 
             #poll the ldr automatically
             ldrResistance = (ldr_adc.voltage * configConstants["ldr_voltdivider_r1"])/(3.3 - ldr_adc.voltage)
@@ -118,13 +150,13 @@ def pollSensors():
             #do the light control logic here, while getting pushswitch and pir sensor states
             if light_relay.value == 0 and ldrLux < configSettings["lux_darkness"]:
                 # prepare to turn on the light when darkness is detected, either by switch or pir
-                if light_pushswitch_state == 1:
+                if light_pushswitch_state == 1 or light_pirSensor_state == 1:
                     light_relay.on()
                     log_lightState(1)
 
             elif light_relay.value == 1:
                 # prepare to turn off the light
-                if light_pushswitch_state == 1:
+                if light_pushswitch_state == 1 or light_pirSensor_state == 1:
                     light_relay.off()
                     log_lightState(0)
 
@@ -142,8 +174,8 @@ def pollSensors():
 
 ##### Flask server app routes put below here #####
 
-@app.route("/overrideLightCtrl", methods=["GET"])
-def overrideLightState():
+@app.route("/setLightState", methods=["GET"])
+def setLightState():
     # override to manually switch on/off the light
     lightStatus = {
         "status": "",
@@ -153,11 +185,7 @@ def overrideLightState():
 
     lightState = request.args.get("state", "-1")
     
-    if lightState == "-1":
-        lightStatus["status"] = "error"
-        lightStatus["errormessage"] = "No value is specified"
-
-    elif lightState == "1": # override to turn on the light
+    if lightState == "1": # override to turn on the light
         if light_relay.value == 0:
             light_relay.on()
             lightStatus["status"] = "ok"
@@ -174,11 +202,18 @@ def overrideLightState():
         else:
             lightStatus["status"] = "error"
             lightStatus["errormessage"] = "Light is already off"
+
     else:
         lightStatus["status"] = "error"
         lightStatus["errormessage"] = "Invalid value"
 
     return lightStatus
+
+@app.route('/getLightState')
+def getLightState():
+    return {
+        "state": light_relay.value
+    }
 
 @app.route('/setCfgSettings', methods=['POST'])
 def setLoggerSettings():
