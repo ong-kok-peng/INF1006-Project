@@ -1,4 +1,5 @@
 import math, json, sys, time, threading, requests
+from pathlib import Path
 from datetime import datetime
 from flask import Flask, render_template, request
 from flask_cors import CORS
@@ -6,7 +7,7 @@ from gpiozero import LED, Button, MotionSensor, GPIOZeroError
 import board
 from adafruit_ads1x15 import ADS1115, AnalogIn, ads1x15
 
-configFilename = "./lightSensorCtrlCfg.json"
+configFilename = "~/lightController/lightSensorCtrlCfg.json"
 allConfig = None; configConstants = None; configSettings = None
 
 initSensorSuccess = False
@@ -17,9 +18,6 @@ light_adcIna199 = None
 ldr_adc = None
 light_relay = None
 
-light_pushswitch = None
-light_pushswitch_state = 0 # 0 is not pressed, 1 is pressed
-
 #light_touchswitch = None
 #light_touchswitch_state = 0 # 0 when not pressed, 1 is pressed
 
@@ -28,8 +26,7 @@ light_pirSensor_state = 0 # 0 when no motion, 1 is motion detected
 
 app = Flask(__name__)
 # define the HTTP server frontend page IP here to prevent browser CORS error
-CORS(app, origins=["http://10.150.189.1"])
-#CORS(app, origins=["http://192.168.1.10"])
+CORS(app, origins=["http://192.168.1.10"])
 
 def initSensors():
     try:
@@ -45,10 +42,7 @@ def initSensors():
         light_relay = LED(configConstants["light_relay_gpio"])
         light_relay.off()
 
-        light_pushswitch = Button(configConstants["push_switch_gpio"], bounce_time=0.05)
-        light_pushswitch.when_pressed = light_pushswitch_pressed
-
-        #light_touchswitch = Button(configConstants["push_switch_gpio"], pull_up=None, active_state=True)
+        #light_touchswitch = Button(configConstants["touch_switch_gpio"], pull_up=None, active_state=True)
         #light_touchswitch.when_pressed = light_touchswitch_pressed
 
         light_pirSensor = MotionSensor(configConstants["pir_gpio"])
@@ -63,13 +57,6 @@ def initSensors():
         print(f"I2C error (perhaps the I2C is disconnected) More info: {e}"); return False
     except GPIOZeroError as e:
         print(f"GPIO init error: {e}"); return False
-
-
-def light_pushswitch_pressed():
-    global light_pushswitch_state
-    light_pushswitch_state = 1
-    time.sleep(1)
-    light_pushswitch_state = 0
 
 """
 def light_touchswitch_pressed():
@@ -149,14 +136,14 @@ def pollSensors():
 
             #do the light control logic here, while getting pushswitch and pir sensor states
             if light_relay.value == 0 and ldrLux < configSettings["lux_darkness"]:
-                # prepare to turn on the light when darkness is detected, either by switch or pir
-                if light_pushswitch_state == 1 or light_pirSensor_state == 1:
+                # prepare to turn on the light when darkness is detected, either by touch switch or pir
+                if light_pirSensor_state == 1:
                     light_relay.on()
                     log_lightState(1)
 
             elif light_relay.value == 1:
                 # prepare to turn off the light
-                if light_pushswitch_state == 1 or light_pirSensor_state == 1:
+                if light_pirSensor_state == 1:
                     light_relay.off()
                     log_lightState(0)
 
@@ -234,7 +221,7 @@ def setLoggerSettings():
                 configSettings[setting] = value
 
         allConfig["settings"] = configSettings
-        with open(configFilename, 'w') as file:
+        with open(Path(configFilename).expanduser(), 'w') as file:
             json.dump(allConfig, file, indent=4)
 
         # Return a JSON response
@@ -254,15 +241,15 @@ def getLoggerSettings():
 
 if __name__ == "__main__":
     try:
-        with open(configFilename, 'r', encoding='utf-8') as file:
+        with open(Path(configFilename).expanduser(), 'r', encoding='utf-8') as file:
             allConfig = json.load(file)
             configConstants = allConfig["constants"]
             configSettings = allConfig["settings"]
             print("Config settings loaded!")
     except FileNotFoundError:
-        print("I2C busy or wrong address, cannot init ADC sensor."); sys.exit()
+        print("Config file not found. Cannot init the script!"); sys.exit()
     except json.jsonDecodeError as e:
-        print("I2C busy or wrong address, cannot init ADC sensor."); sys.exit()
+        print("Config file has errors. Cannot init the script!"); sys.exit()
 
     while not initSensorSuccess:
         if initSensorRetries == maxRetries: break

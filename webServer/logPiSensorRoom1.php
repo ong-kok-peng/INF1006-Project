@@ -4,6 +4,7 @@ $servername = "localhost";
 $username = "homeAutoUser";
 $password = "12345678";
 $dbname = "homeAutoServer";
+$tableName = "room1LightEvents";
 
 $logResult = ["status"=>"", "errormessage"=>"", "message"=>""];
 
@@ -15,7 +16,6 @@ if (!empty($logData) && !empty($logData["logEvent"])) {
     $time = date("H:i:s");
     $logEvent = $logData["logEvent"];
 
-    $tableName = "room1LightEvents";
     $logFields = ["date", "time"]; 
     $logValues = [$date, $time]; 
     $logValPlaceholders = ['?', '?'];
@@ -48,7 +48,8 @@ if (!empty($logData) && !empty($logData["logEvent"])) {
         echo json_encode($logResult);
         //die("MySQL error; " . $e->getMessage());
     }
-    
+
+    $conn = null;
 }
 else {
     $logResult["status"] = "error";

@@ -3,35 +3,57 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="jquery371.min.js"></script>
-        <script src="index.js"></script>
+        <script src="chartjs.js"></script>
         <style>
-            .mainContainer {width: 90%; margin:auto; font-family: Arial, Helvetica, sans-serif; font-size: 15pt;}
+            .mainContainer {width: 90%; margin:auto; font-family: Arial, Helvetica, sans-serif; font-size: 13pt;}
             .subContainer {border:2px black solid; border-radius:15px; padding:15px; margin:20px 0;}
             .subContainerRow {width:60%; margin:10px auto;}
             .userInput {height:35px; margin-left:10px; font-size:12pt;}
+            #switchButtons {display: flex; flex-direction: row; flex-wrap: wrap;}
+            .switchButton {width:160px; margin:3px 10px;}
             #lightCtrlSettingsForm .formField {display:block; margin:10px auto; }
+            #lightUsageStatsChart {display:flex; flex-direction: row; flex-wrap: wrap;}
+            .statChart {max-width:42%; min-height:300px; max-height:300px; margin:10px 20px;}
         </style>
     </head>
     <body>
         <div class="mainContainer">
             <div class="subContainer" id="lightCtrlSwitches">
                 <p class="subContainerRow" style="font-weight: bold;">Lights remote control</p>
-                <!-- Each room switch button row populates here-->
+                <p class="subContainerRow" id="switchButtons">
+                    <!-- Each room switch button row populates here-->
+                </p>
             </div>
-            <div class="subContainer" id="lightCtrlSettings">
+            <div class="subContainer" id="lightCfgSettings">
                 <p class="subContainerRow" style="font-weight: bold;">Lights control settings</p>
                 <p class="subContainerRow">
                     <label>Select room: </label>
-                    <select id="selRoomDrpDwn" class="userInput">
+                    <select id="lightCfgSelRoom" class="userInput">
                         <option value="">No selection</option>
                         <!-- Each room selection option populates here-->
                     </select>
                 </p>
-                <div id="lightCtrlSettingsForm" class="subContainerRow">
+                <div id="lightCfgSettingsForm" class="subContainerRow">
                     <!-- Each settings field populates here-->
                 </div>
             </div>
+            <div class="subContainer" id="lightUsageStats">
+                <p class="subContainerRow" style="font-weight: bold;">Lights usage statistics</p>
+                <p class="subContainerRow">
+                    <label>Select room: </label>
+                    <select id="lightUsageSelRoom" class="userInput">
+                        <option value="">No selection</option>
+                        <!-- Each room selection option populates here-->
+                    </select>
+                </p>
+                <div id="lightUsageStatsChart" class="subContainerRow">
+                    <!-- Light usage charts display here-->
+                </div>
+            </div>
         </div>
+        <!-- local javascript at the end of body -->
+        <script src="lightUsageChart.js"></script>
+        <script src="index.js"></script>
     </body>
 </html>
 

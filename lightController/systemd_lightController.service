@@ -1,0 +1,13 @@
+[Unit]
+Description=INF1006 Project GRP12 Light Controller Auto Script
+After=multi-user.target
+
+[Service]
+Type=simple
+User=user
+WorkingDirectory=/home/user/lightController
+ExecStart=/usr/bin/python3 /home/user/lightController/lightSensorCtrl.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
