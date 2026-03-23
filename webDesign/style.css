@@ -1,0 +1,100 @@
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+.appContainer {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+}
+
+.appTitle {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* CARD */
+.card {
+    background: #1e293b;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* SWITCH GRID */
+.switchGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.switchCard {
+    background: #334155;
+    padding: 15px;
+    border-radius: 12px;
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* BUTTON */
+.switchBtn {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.switchBtn.off {
+    background: #475569;
+    color: white;
+}
+
+.switchBtn.on {
+    background: #22c55e;
+    color: white;
+}
+
+/* FORM */
+.formGroup {
+    margin: 15px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.inputField {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: #334155;
+    color: white;
+}
+
+.primaryBtn {
+    margin-top: 15px;
+    padding: 12px;
+    background: #3b82f6;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* CHART GRID */
+.chartGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+canvas {
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 45%;
+}
