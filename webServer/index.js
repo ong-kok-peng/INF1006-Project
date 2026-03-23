@@ -51,25 +51,25 @@ $(document).ready(async function() {
         
         if (lightStateData === undefined) {
             switchBtn = `
-                <span class="switchButton">
+                <span class="switchBtnWrapper">
                     <label>${room["name"]}</label><button disabled class="userInput switchBtn" id="${room["name"]}">Turn On</button>
                 </span>
             `;
         }
         else {
-            let switchBtnCss = ""; let switchBtnTxt = ""; let switchBtnVal = ""
-            if (lightStateData["state"] == 0) { switchBtnTxt = "Turn On"; switchBtnVal = "on" }
-            else { switchBtnCss = "background:green; color:white"; switchBtnTxt = "Turn Off"; switchBtnVal = "off"  }
+            let switchBtnClass = "userInput switchBtn"; let switchBtnTxt = ""; let switchBtnVal = "";
+            if (lightStateData["state"] == 0) { switchBtnClass += " off"; switchBtnTxt = "Turn On"; switchBtnVal = "on"; }
+            else { switchBtnClass += " on"; switchBtnTxt = "Turn Off"; switchBtnVal = "off"; }
 
             switchBtn = `
-                <span class="switchButton">
+                <span class="switchBtnWrapper">
                     <label>${room["name"]}</label>
-                    <button class="userInput switchBtn" id="${room["name"]}" style="${switchBtnCss}" value = "${switchBtnVal}">${switchBtnTxt}</button>
+                    <button class="${switchBtnClass}" id="${room["name"]}" value = "${switchBtnVal}">${switchBtnTxt}</button>
                 </span>
             `;
         }
         
-        $("#switchButtons").append(switchBtn);
+        $("#switchBtnsGrid").append(switchBtn);
 
         //populate the all the select drop down options as well for each room
         $("#lightCfgSelRoom").append(`<option value="${room["name"]}">${room["name"]}</option>`); //light control settings drop down
@@ -95,7 +95,7 @@ $(document).ready(async function() {
     }
 });
 
-$("#switchButtons").on('click', '.switchBtn', async function(event) {
+$("#switchBtnsGrid").on('click', '.switchBtn', async function(event) {
     //switch button event to on/off light for corresponding room
     //when api receive as successful, wait for a short while and auto refresh page
     const switchBtn = event.target;
@@ -129,13 +129,13 @@ $("#lightCfgSelRoom").on('change', async function() {
         if (lightCfgSettings === undefined) { alert(`Can't get light settings for room ${roomName}. Light controller request failed.`) }
         else {
             const cfgSettingsFields =  `
-                <span class="formField">
+                <span class="cfgSettingsField">
                     <label>Voltage of light (V): </label> <input class="userInput" type="text" id="light_voltage" value="${lightCfgSettings["light_voltage"]}" />
                 </span>
-                <span class="formField">
+                <span class="cfgSettingsField">
                     <label>Darkness threshold (LUX): </label> <input class="userInput" type="text" id="lux_darkness" value="${lightCfgSettings["lux_darkness"]}" />
                 </span>
-                <span class="formField">
+                <span class="cfgSettingsField">
                     <label>Monitoring log interval (min): </label> <input class="userInput" type="text" id="log_interval_min" value="${lightCfgSettings["log_interval_min"]}" />
                 </span>
                 <button class="userInput" id="setCfgSettingsBtn" style="display:block; margin:auto;">Set Settings</button>
