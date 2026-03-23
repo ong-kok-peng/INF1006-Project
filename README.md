@@ -15,6 +15,8 @@ Raspberry Pis are used as part of the module's BOM requirements. We know that it
 * User can adjust certain parameters for the light control algorithm i.e. darkness LUX threshold, suiting different home environments
 
 ## System architecture design
+<img width="800" height="480" alt="INF1006_project_topology" src="https://github.com/user-attachments/assets/64c88fcb-6e13-4b24-8d6e-a350e557769b" />
+
 We deploy in a two-room apartment. There is one Pi for each room, which communicates to the central dashboard + server Pi in a star topology. All Pis connect to the same Wifi access point to form a local LAN.
 
 The room Pis will interact with sensors, mainly the LDR (light dependent resistor) which is deployed outside the apartment to capture outdoor light intensity. Each room will also have various sensors such as touch switch and PIR motion sensor.
